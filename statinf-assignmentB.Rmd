@@ -1,0 +1,75 @@
+---
+title: "Statistical Inference Assignment, Part B"
+author: "Teja Kodali"
+date: "22 March 2015"
+output: word_document
+---
+
+## Overview
+Here, we will investigate the ToothGrowth data in the R datasets package. We
+will load the ToothGrowth data, perform some basic data analysis and provide a
+summary of the data. We will use confidence intervals and hypotheses tests to
+compare tooth growth by supp and dose.
+
+## Loading the data
+```{r}
+library(ggplot2)
+library(datasets)
+data(ToothGrowth)
+str(ToothGrowth)
+head(ToothGrowth)
+```
+
+## Plotting
+```{r}
+plot <- ggplot(ToothGrowth, 
+               aes(x=factor(dose),y=len,fill=factor(dose)))
+plot + geom_boxplot(notch=F) + facet_grid(.~supp) +
+     scale_x_discrete("Dosage (Milligram)") +   
+     scale_y_continuous("Length of Teeth") +  
+     ggtitle("Variation of teeth length with dosage")
+
+```
+
+As we can see, the length of the teeth is higher when dosage is higher,
+regardless of whether it was Orange Juice of Vitamin C.
+
+## Summary of data
+```{r}
+ToothGrowth$dose <- as.factor(ToothGrowth$dose)
+summary(ToothGrowth)
+```
+```{r}
+table(ToothGrowth$supp, ToothGrowth$dose)
+
+```
+
+
+## Confidence intervals and hypotheses tests
+```{r}
+supp.t1 <- t.test(len~supp, paired=F, var.equal=T, data=ToothGrowth)
+supp.t2 <- t.test(len~supp, paired=F, var.equal=F, data=ToothGrowth)
+supp.result <- data.frame("p-value"=c(supp.t1$p.value, supp.t2$p.value),
+                          "Conf-Low"=c(supp.t1$conf[1],supp.t2$conf[1]),
+                          "Conf-High"=c(supp.t1$conf[2],supp.t2$conf[2]),
+                          row.names=c("Equal Var","Unequal Var"))
+supp.result
+```
+
+## Conclusions
+Based on the analysis above, we can conclude that 
+
+1. The 2mg dose has larger impact on tooth growth than 1mg and 0.5mg, while 1mg 
+dose has more impact than 0.5mg dose. So there is a different in the growth of 
+the tooth while the doses are larger.
+
+2. There is no doubt that Orange Juice and Vitamin C have obvious different 
+impact on tooth growth.
+
+## Assumptions
+It is assumed that
+
+1. There are no other supplements consumed by the subjects.
+
+2. Orange Juice and Vitamin C are the only two factors influencing the growth of
+the teeth.

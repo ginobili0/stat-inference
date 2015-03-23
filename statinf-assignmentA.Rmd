@@ -1,0 +1,70 @@
+---
+title: "Statistical Inference Assignment Part A"
+author: "Teja Kodali"
+date: "22 March 2015"
+output: word_document
+---
+
+## Overview
+Here, we will investigate the exponential distribution in R and compare it with
+the Central Limit Theorem.
+The exponential distribution can be simulated in R with rexp(n, lambda) where
+lambda is the rate parameter. The mean of exponential distribution is 1/lambda
+and the standard deviation is also 1/lambda.
+
+## Sample mean versus Theoretical mean
+
+```{r}
+lambda = 0.2
+n = 40
+nsms = 1:1000
+set.seed(500)
+means <- data.frame(x = sapply(nsms, function(x) {mean(rexp(n, lambda))}))
+```
+
+```{r}
+round(mean(means$x), 2)
+```
+
+As we can see, the sample mean is 5.01.
+
+The theoretical mean can be calculated by
+
+```{r}
+theoreticalMean <- 1/lambda
+theoreticalMean
+```
+
+The theoretical mean is 5, and is approximately equal to the sample mean.
+
+## Sample Variance versus Theoretical Variance
+
+```{r}
+round(var(means$x), 2)
+```
+
+As we can see, the sample variance is 0.62.
+
+The theoretical variance can be calculated by
+
+```{r}
+theoreticalVariance <- round(((1/lambda)/sqrt(40)) ^ 2, 2)
+theoreticalVariance
+```
+
+As expected, the theoretical variance is 0.62 and is equal to the sample variance.
+
+## Distribution
+
+```{r}
+library(ggplot2)
+distPlot <- ggplot(data = means, aes(x = x)) + 
+        geom_histogram(aes(y = ..density..), fill = I('#00e6fa'), binwidth = 0.20, 
+                       color = I('black')) +
+        stat_function(fun = dnorm, arg = list(mean = 5, sd = sd(means$x)))
+distPlot
+```
+
+Above, we have a histogram plot of the means of the simulation. It is overload 
+with a normal distribution with mean = 5 and standard deviation = 0.79. As we
+can see, the distribution of the simulations appears normal.
